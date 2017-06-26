@@ -1,23 +1,22 @@
 'use strict';
 
-module.exports.errorResponse = (err) => {
+export function errorResponse(err) {
   return {
     statusCode: 500,
     body: JSON.stringify(err)
   }
 }
 
-module.exports.badRequest = () => {
+export function badRequest() {
   return {
     statusCode: 400,
     body: JSON.stringify({
-      msg: 'Please include channel, platform, and current version query parameters'  
+      msg: 'Please include channel, platform, and current version query parameters'
     })
   }
 }
 
-module.exports.windowsReleaseFile = (url) => {
-  // TODO Double check that Squirrel.Windows follows redirects!
+export function redirectResponse(url) {
   return {
     statusCode: 302,
     headers: {
@@ -26,7 +25,7 @@ module.exports.windowsReleaseFile = (url) => {
   }
 }
 
-module.exports.updateAvailable = (url) => {
+export function updateAvailable(url) {
   return {
     statusCode: 200,
     body: JSON.stringify({
@@ -35,7 +34,7 @@ module.exports.updateAvailable = (url) => {
   }
 }
 
-module.exports.noUpdate = () => {
+export function noUpdate() {
   return {
     statusCode: 204
   }

@@ -1,10 +1,10 @@
 'use strict';
 
-const semver = require('semver');
-const AWS = require('aws-sdk');
-const platforms = require('./platforms');
+import 'semver';
+import 'aws-sdk';
+import { isMac, isWindows } from './platforms';
 
-class ReleaseProvider {
+export class ReleaseProvider {
   constructor(channel, platform) {
     this.latestVersion = null;
     this.latestFile = null;
@@ -17,20 +17,27 @@ class ReleaseProvider {
   }
 
   lookForUpdate(currentVersion) {
-    console.log(this.platform);
-    console.log(this.prefix);
-    console.log(currentVersion);
-
     this.targetFileMatcher = this.buildUpdateFileMatcher();
     this.latestVersion = currentVersion;
     return new Promise((resolve, reject) => {
-      this.findLatestReleaseOnS3(resolve, reject);
+      this.lookForUpdateOnS3(resolve, reject);
     });
+  }
+
+  getLatestRelease() {
+    this.targetFileMatcher = this.buildInstallFileMatcher();
+    return new Promise((resolve, reject) => {
+      this.lookForUpdateOnS3(resolve, reject);
+    });
+  }
+
+  getUrlFor(file) {
+    return this.urlFor(this.prefix + '/' + file);
   }
 
   // ----- Helpers -----
 
-  findLatestReleaseOnS3(onSuccess, onError) {
+  lookForUpdateOnS3(onSuccess, onError) {
     let params = this.getParams();
 
     this.client().listObjectsV2(params, (err, data) => {
@@ -44,7 +51,7 @@ class ReleaseProvider {
 
       if (data.IsTruncated) {
         this.continuationToken = data.NextContinuationToken;
-        this.findLatestReleaseOnS3(onSuccess, onError);
+        this.lookForUpdateOnS3(onSuccess, onError);
         return;
       }
 
@@ -74,17 +81,17 @@ class ReleaseProvider {
   }
 
   buildUpdateFileMatcher() {
-    if (platforms.isMac(this.platform)) {
+    if (isMac(this.platform)) {
       return new RegExp('\.zip$');
-    } else if (platforms.isWindows(this.platform)) {
-      return new RegExp('\.nupkg$');
+    } else if (isWindows(this.platform)) {
+      return new RegExp('^RELEASES$');
     }
   }
 
   buildInstallFileMatcher() {
-    if (platforms.isMac(this.platform)) {
+    if (isMac(this.platform)) {
       return new RegExp('\.dmg$');
-    } else if (platforms.isWindows(this.platform)) {
+    } else if (isWindows(this.platform)) {
       return new RegExp('\.exe$');
     }
   }
@@ -120,5 +127,3 @@ class ReleaseProvider {
     }
   }
 }
-
-module.exports.ReleaseProvider = ReleaseProvider;

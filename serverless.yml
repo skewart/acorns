@@ -16,21 +16,31 @@ provider:
       Resource: "arn:aws:s3:::${env:S3_BUCKET_NAME}"
 
 functions:
-  # Existing clients checking in to see if a new release is available
+  # Existing clients checking in to see if a new update is available
   update:
-    handler: update.check
+    handler: handler.update
     events:
      - http:
          path: update/{platform}/{version}
          method: get
-
-  # # Handle a /latest URL for new users to download a version of the app (Different params for platforms?)
-  # download:
-  #   handler: download.latest
-  #   events:
-  #     - http:
-  #         path: latest
-  #         method: get
+     - http:
+         path: update/{platform}/{version}/RELEASES
+         method: get
+  # Download the latest release for new installs
+  latest:
+    handler: handler.latest
+    events:
+      - http:
+          path: download/latest/{platform}
+          method: get
+  # Download a specific file
+  download:
+    handler: handler.download
+    events:
+      - http:
+          path: download/{platform}/{version}/{file}
+          method: get
 
 plugins:
+  - serverless-webpack
   - serverless-offline

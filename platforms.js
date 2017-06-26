@@ -1,18 +1,18 @@
 'use strict';
 
 const
-  MAC_PLATFORM_NAME = 'mac',
+  MAC_PLATFORM_NAME     = 'mac',
   WINDOWS_PLATFORM_NAME = 'win';
 
-function isMac(platform) {
+export function isMac(platform) {
   return platform === 'mac' || platform === 'osx';
 }
 
-function isWindows(platform) {
+export function isWindows(platform) {
   return platform === 'win' || platform === 'win32';
 }
 
-module.exports.match = (string) => {
+export function match(string) {
   if (isMac(string)) {
     return MAC_PLATFORM_NAME;
   }
@@ -21,13 +21,10 @@ module.exports.match = (string) => {
   }
 }
 
-module.exports.isMac = isMac;
-module.exports.isWindows = isWindows;
-
-module.exports.macPlatform = () => {
+export function macPlatform() {
   return MAC_PLATFORM_NAME;
 }
 
-module.exports.windowsPlatform = () => {
+export function windowsPlatform() {
   return WINDOWS_PLATFORM_NAME;
 }
